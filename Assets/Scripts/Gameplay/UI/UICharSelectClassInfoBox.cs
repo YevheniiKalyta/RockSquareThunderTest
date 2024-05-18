@@ -1,4 +1,3 @@
-using System;
 using Unity.BossRoom.Gameplay.Configuration;
 using TMPro;
 using UnityEngine;

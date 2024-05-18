@@ -1,7 +1,7 @@
-using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.UI;
 
 namespace Unity.BossRoom.Gameplay.UI
 {
@@ -21,9 +21,13 @@ namespace Unity.BossRoom.Gameplay.UI
         [SerializeField]
         private Vector3 m_CursorOffset;
 
+        private RectTransform m_RectTransform;
+
         private void Awake()
         {
             Assert.IsNotNull(m_Canvas);
+            Assert.IsNotNull(m_WindowRoot);
+            m_RectTransform = m_WindowRoot.transform as RectTransform;
         }
 
         /// <summary>
@@ -32,24 +36,17 @@ namespace Unity.BossRoom.Gameplay.UI
         public void ShowTooltip(string text, Vector3 screenXy)
         {
             m_TextField.text = text;
-            if (!m_WindowRoot.activeInHierarchy)
-            {
-                m_WindowRoot.transform.position = new Vector3(-10000, -10000, 0);
-            }
             m_WindowRoot.SetActive(true);
-            StartCoroutine(RepositionTooltip(screenXy));
+            RepositionTooltip(screenXy);
         }
 
-        private IEnumerator RepositionTooltip(Vector3 screenXy)
+        private void RepositionTooltip(Vector3 screenXy)
         {
-            // Wait for the end of the frame to let the layout system update the size
-            yield return new WaitForEndOfFrame();
-
-            // Adjust screen coordinates with cursor offset
+            LayoutRebuilder.ForceRebuildLayoutImmediate(m_WindowRoot.GetComponent<RectTransform>());
             screenXy += m_CursorOffset;
 
             // Get the tooltip dimensions
-            Vector2 sizeDelta = GetComponent<RectTransform>().sizeDelta;
+            Vector2 sizeDelta = m_RectTransform.sizeDelta;
             Vector3 finalScale = new Vector3(sizeDelta.x * transform.lossyScale.x, sizeDelta.y * transform.lossyScale.y);
 
             // Adjust the position if the tooltip exceeds the screen boundaries
