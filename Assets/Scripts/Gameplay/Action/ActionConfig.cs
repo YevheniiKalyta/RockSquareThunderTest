@@ -105,5 +105,15 @@ namespace Unity.BossRoom.Gameplay.Actions
 
             return false;
         }
+
+        public string ReturnDetailedTooltip()
+        {
+            return $@"<b>{DisplayedName}</b>
+
+{Description}
+<b>Damage/Healing</b>: {Mathf.Abs(Amount)}
+<b>ManaCost</b>: {ManaCost}
+<b>Range</b>: {Range}";
+        }
     }
 }

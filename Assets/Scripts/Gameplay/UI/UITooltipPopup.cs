@@ -1,4 +1,4 @@
-using System;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -31,10 +31,38 @@ namespace Unity.BossRoom.Gameplay.UI
         /// </summary>
         public void ShowTooltip(string text, Vector3 screenXy)
         {
-            screenXy += m_CursorOffset;
-            m_WindowRoot.transform.position = GetCanvasCoords(screenXy);
             m_TextField.text = text;
+            if (!m_WindowRoot.activeInHierarchy)
+            {
+                m_WindowRoot.transform.position = new Vector3(-10000, -10000, 0);
+            }
             m_WindowRoot.SetActive(true);
+            StartCoroutine(RepositionTooltip(screenXy));
+        }
+
+        private IEnumerator RepositionTooltip(Vector3 screenXy)
+        {
+            // Wait for the end of the frame to let the layout system update the size
+            yield return new WaitForEndOfFrame();
+
+            // Adjust screen coordinates with cursor offset
+            screenXy += m_CursorOffset;
+
+            // Get the tooltip dimensions
+            Vector2 sizeDelta = GetComponent<RectTransform>().sizeDelta;
+            Vector3 finalScale = new Vector3(sizeDelta.x * transform.lossyScale.x, sizeDelta.y * transform.lossyScale.y);
+
+            // Adjust the position if the tooltip exceeds the screen boundaries
+            if (screenXy.x - finalScale.x < 0)
+            {
+                screenXy.x = finalScale.x;
+            }
+            if (screenXy.y - finalScale.y < 0)
+            {
+                screenXy.y = finalScale.y;
+            }
+
+            m_WindowRoot.transform.position = GetCanvasCoords(screenXy);
         }
 
         /// <summary>
@@ -54,7 +82,7 @@ namespace Unity.BossRoom.Gameplay.UI
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
                 m_Canvas.transform as RectTransform,
                 screenCoords,
-                m_Canvas.worldCamera,
+                m_Canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : m_Canvas.worldCamera,
                 out canvasCoords);
             return m_Canvas.transform.TransformPoint(canvasCoords);
         }

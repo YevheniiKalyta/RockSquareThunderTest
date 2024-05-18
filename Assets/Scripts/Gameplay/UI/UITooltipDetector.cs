@@ -25,6 +25,11 @@ namespace Unity.BossRoom.Gameplay.UI
         private string m_TooltipText;
 
         [SerializeField]
+        [Multiline]
+        [Tooltip("The text of the tooltip (this is the default text; it can also be changed in code)")]
+        private string m_DetailedTooltipText;
+
+        [SerializeField]
         [Tooltip("Should the tooltip appear instantly if the player clicks this UI element?")]
         private bool m_ActivateOnClick = true;
 
@@ -32,18 +37,32 @@ namespace Unity.BossRoom.Gameplay.UI
         [Tooltip("The length of time the mouse needs to hover over this element before the tooltip appears (in seconds)")]
         private float m_TooltipDelay = 0.5f;
 
+        [SerializeField]
+        [Tooltip("The length of time the mouse needs to hover over this element before the tooltip appears (in seconds)")]
+        private float m_DetailedTooltipDelay = -1f;
+
         private float m_PointerEnterTime = 0;
         private bool m_IsShowingTooltip;
+        private bool m_IsShowingDetailedTooltip;
 
-        public void SetText(string text)
+        public void SetText(string text, string detailedText = "")
         {
-            bool wasChanged = text != m_TooltipText;
+            bool wasChanged = text != m_TooltipText || detailedText != m_DetailedTooltipText;
             m_TooltipText = text;
-            if (wasChanged && m_IsShowingTooltip)
+            m_DetailedTooltipText = detailedText;
+            if (wasChanged)
             {
                 // we changed the text while of our tooltip was being shown! We need to re-show the tooltip!
-                HideTooltip();
-                ShowTooltip();
+                if (m_IsShowingTooltip)
+                {
+                    HideTooltip();
+                    ShowTooltip();
+                }
+                else if(m_IsShowingDetailedTooltip)
+                {
+                    HideTooltip();
+                    ShowDetailedTooltip();
+                }
             }
         }
 
@@ -68,9 +87,18 @@ namespace Unity.BossRoom.Gameplay.UI
 
         private void Update()
         {
-            if (m_PointerEnterTime != 0 && (Time.time - m_PointerEnterTime) > m_TooltipDelay)
+            if (m_PointerEnterTime != 0)
             {
-                ShowTooltip();
+                float timeSincePointerEnter = Time.time - m_PointerEnterTime;
+
+                if (m_DetailedTooltipDelay > 0 && timeSincePointerEnter > m_TooltipDelay + m_DetailedTooltipDelay)
+                {
+                    ShowDetailedTooltip();
+                }
+                else if (timeSincePointerEnter > m_TooltipDelay)
+                {
+                    ShowTooltip();
+                }
             }
         }
 
@@ -83,12 +111,22 @@ namespace Unity.BossRoom.Gameplay.UI
             }
         }
 
+        private void ShowDetailedTooltip()
+        {
+            if (!m_IsShowingDetailedTooltip)
+            {
+                m_TooltipPopup.ShowTooltip(m_DetailedTooltipText, Input.mousePosition);
+                m_IsShowingDetailedTooltip = true;
+            }
+        }
+
         private void HideTooltip()
         {
-            if (m_IsShowingTooltip)
+            if (m_IsShowingTooltip || m_IsShowingDetailedTooltip)
             {
                 m_TooltipPopup.HideTooltip();
                 m_IsShowingTooltip = false;
+                m_IsShowingDetailedTooltip = false;
             }
         }
 

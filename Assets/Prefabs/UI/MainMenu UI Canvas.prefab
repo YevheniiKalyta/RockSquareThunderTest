@@ -1207,8 +1207,10 @@ MonoBehaviour:
   m_TooltipText: Unity Gaming Services ProjectID not set up. Click the Readme file
     in the Assets Folder within the Project window in-editor to follow "How to set
     up Unity Gaming Services"
+  m_DetailedTooltipText: 
   m_ActivateOnClick: 1
-  m_TooltipDelay: 0
+  m_TooltipDelay: 0.5
+  m_DetailedTooltipDelay: -1
 --- !u!224 &8941352775669677356 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7721113380319664589, guid: addf3685293c35d48a673397c748f116, type: 3}

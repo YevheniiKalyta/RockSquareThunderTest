@@ -91,7 +91,8 @@ namespace Unity.BossRoom.Gameplay.UI
                 UITooltipDetector tooltipDetector = iconSlot.GetComponent<UITooltipDetector>();
                 if (tooltipDetector)
                 {
-                    tooltipDetector.SetText(string.Format(m_TooltipFormat, action.Config.DisplayedName, action.Config.Description));
+                    tooltipDetector.SetText(string.Format(m_TooltipFormat, action.Config.DisplayedName, action.Config.Description),
+                        action.Config.ReturnDetailedTooltip());
                 }
             }
         }
