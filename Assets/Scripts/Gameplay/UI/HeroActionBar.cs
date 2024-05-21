@@ -33,12 +33,7 @@ namespace Unity.BossRoom.Gameplay.UI
         [SerializeField]
         [Tooltip("The Emote bar that will be enabled or disabled when clicking the Emote bar button")]
         GameObject m_EmotePanel;
-
-        [SerializeField]
-        [Tooltip("Format of tooltips. {0} is skill name, {1} is skill description. Html-esque tags allowed!")]
-        [Multiline]
-        private string m_TooltipFormat = "<b>{0}</b>\n\n{1}";
-
+   
         /// <summary>
         /// Our input-sender. Initialized in RegisterInputSender()
         /// </summary>
@@ -271,8 +266,7 @@ namespace Unity.BossRoom.Gameplay.UI
                 buttonInfo.Button.gameObject.SetActive(true);
                 buttonInfo.Button.interactable = isClickable;
                 buttonInfo.Button.image.sprite = sprite;
-                buttonInfo.Tooltip.SetText(string.Format(m_TooltipFormat, action.Config.DisplayedName, action.Config.Description),
-                    action.Config.ReturnDetailedTooltip());
+                buttonInfo.Tooltip.SetText(action.Config.ReturnBasicTooltip(action.ActionID.ID));
             }
 
             // store the action type so that we can retrieve it in click events

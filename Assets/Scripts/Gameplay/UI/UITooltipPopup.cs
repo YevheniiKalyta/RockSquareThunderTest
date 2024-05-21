@@ -1,7 +1,9 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 namespace Unity.BossRoom.Gameplay.UI
 {
@@ -9,7 +11,7 @@ namespace Unity.BossRoom.Gameplay.UI
     /// This controls the tooltip popup -- the little text blurb that appears when you hover your mouse
     /// over an ability icon.
     /// </summary>
-    public class UITooltipPopup : MonoBehaviour
+    public class UITooltipPopup : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         [SerializeField]
         private Canvas m_Canvas;
@@ -19,9 +21,18 @@ namespace Unity.BossRoom.Gameplay.UI
         [SerializeField]
         private TextMeshProUGUI m_TextField;
         [SerializeField]
+        private UnityEngine.UI.Image m_fillImage;
+        [SerializeField]
         private Vector3 m_CursorOffset;
 
+        public bool IsPointerOverTooltip = false;
+        public Canvas Canvas => m_Canvas;
+        public TextMeshProUGUI TextField => m_TextField;
+
         private RectTransform m_RectTransform;
+        private bool m_IsPersistent;
+
+        public bool IsPersistent => m_IsPersistent;
 
         private void Awake()
         {
@@ -40,9 +51,23 @@ namespace Unity.BossRoom.Gameplay.UI
             RepositionTooltip(screenXy);
         }
 
+        public void SetFillImage(float amount)
+        {
+            if (!m_IsPersistent)
+            {
+                m_fillImage.fillAmount = amount;
+            }
+        }
+
+        public void SetPersistent(bool on)
+        {
+            m_IsPersistent = on;
+            m_fillImage.raycastTarget = on;
+        }
+
         private void RepositionTooltip(Vector3 screenXy)
         {
-            LayoutRebuilder.ForceRebuildLayoutImmediate(m_WindowRoot.GetComponent<RectTransform>());
+            LayoutRebuilder.ForceRebuildLayoutImmediate(m_RectTransform);
             screenXy += m_CursorOffset;
 
             // Get the tooltip dimensions
@@ -67,6 +92,7 @@ namespace Unity.BossRoom.Gameplay.UI
         /// </summary>
         public void HideTooltip()
         {
+            SetPersistent(false);
             m_WindowRoot.SetActive(false);
         }
 
@@ -84,6 +110,8 @@ namespace Unity.BossRoom.Gameplay.UI
             return m_Canvas.transform.TransformPoint(canvasCoords);
         }
 
+
+
 #if UNITY_EDITOR
         private void OnValidate()
         {
@@ -95,6 +123,16 @@ namespace Unity.BossRoom.Gameplay.UI
                     m_Canvas = FindObjectOfType<Canvas>();
                 }
             }
+        }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+           IsPointerOverTooltip = true;
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            IsPointerOverTooltip = false;
         }
 #endif
 

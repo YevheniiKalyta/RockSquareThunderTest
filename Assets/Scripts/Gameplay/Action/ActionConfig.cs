@@ -106,6 +106,13 @@ namespace Unity.BossRoom.Gameplay.Actions
             return false;
         }
 
+        public string ReturnBasicTooltip(int id)
+        {
+            return $@"<color=#6397fd><link=""{id}""><b><u>{DisplayedName}</u></b></link></color>
+
+{Description}";
+        }
+
         public string ReturnDetailedTooltip()
         {
             return $@"<b>{DisplayedName}</b>

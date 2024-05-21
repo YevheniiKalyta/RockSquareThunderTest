@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -15,6 +16,8 @@ namespace Unity.BossRoom.Gameplay.UI
     public class UITooltipDetector : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
     {
         [SerializeField]
+        private UITooltipPopupManager m_TooltipPopupManager;
+
         [Tooltip("The actual Tooltip that should be triggered")]
         private UITooltipPopup m_TooltipPopup;
 
@@ -22,11 +25,6 @@ namespace Unity.BossRoom.Gameplay.UI
         [Multiline]
         [Tooltip("The text of the tooltip (this is the default text; it can also be changed in code)")]
         private string m_TooltipText;
-
-        [SerializeField]
-        [Multiline]
-        [Tooltip("The text of the tooltip (this is the default text; it can also be changed in code)")]
-        private string m_DetailedTooltipText;
 
         [SerializeField]
         [Tooltip("Should the tooltip appear instantly if the player clicks this UI element?")]
@@ -38,34 +36,25 @@ namespace Unity.BossRoom.Gameplay.UI
 
         [SerializeField]
         [Tooltip("The length of time the mouse needs to hover over this element before the tooltip appears (in seconds)")]
-        private float m_DetailedTooltipDelay = -1f;
+        private float m_PersistentTooltipDelay = -1f;
 
         private float m_PointerEnterTime = 0;
         private bool m_IsShowingTooltip;
-        private bool m_IsShowingDetailedTooltip;
 
-        public void SetText(string text, string detailedText = "")
+
+        public bool IsPointerOverElement => m_PointerEnterTime > 0;
+
+        public void SetText(string text)
         {
-            bool wasChanged = text != m_TooltipText || detailedText != m_DetailedTooltipText;
-            m_TooltipText = text;
-            m_DetailedTooltipText = detailedText;
-            if (wasChanged)
-            {
-                // we changed the text while of our tooltip was being shown! We need to re-show the tooltip!
-                if (m_IsShowingTooltip)
-                {
-                    HideTooltip();
-                    ShowTooltip();
-                }
-                else if(m_IsShowingDetailedTooltip)
-                {
-                    HideTooltip();
-                    ShowDetailedTooltip();
-                }
-            }
+            m_TooltipText = text; 
         }
 
         public void OnPointerEnter(PointerEventData eventData)
+        {
+            OnPointerEnterProcessing();
+        }
+
+        public void OnPointerEnterProcessing()
         {
             m_PointerEnterTime = Time.time;
         }
@@ -73,7 +62,6 @@ namespace Unity.BossRoom.Gameplay.UI
         public void OnPointerExit(PointerEventData eventData)
         {
             m_PointerEnterTime = 0;
-            HideTooltip();
         }
 
         public void OnPointerClick(PointerEventData eventData)
@@ -84,48 +72,54 @@ namespace Unity.BossRoom.Gameplay.UI
             }
         }
 
+        private void OnDisable()
+        {
+            m_PointerEnterTime = 0;
+        }
+
         private void Update()
         {
             if (m_PointerEnterTime != 0)
             {
                 float timeSincePointerEnter = Time.time - m_PointerEnterTime;
 
-                if (m_DetailedTooltipDelay > 0 && timeSincePointerEnter > m_TooltipDelay + m_DetailedTooltipDelay)
+                if (m_PersistentTooltipDelay > 0 && timeSincePointerEnter > m_TooltipDelay + m_PersistentTooltipDelay)
                 {
-                    ShowDetailedTooltip();
+                    m_TooltipPopup.SetPersistent(true);
                 }
                 else if (timeSincePointerEnter > m_TooltipDelay)
                 {
                     ShowTooltip();
+                    m_TooltipPopup.SetFillImage(timeSincePointerEnter / (m_TooltipDelay + m_PersistentTooltipDelay));
                 }
             }
         }
 
-        private void ShowTooltip()
+        public void SetPersistent(bool on)
+        {
+            if (m_IsShowingTooltip)
+            {
+                m_TooltipPopup.SetPersistent(on);
+            }
+        }
+
+        public void ShowTooltip()
         {
             if (!m_IsShowingTooltip)
             {
-                m_TooltipPopup.ShowTooltip(m_TooltipText, Input.mousePosition);
+                m_TooltipPopupManager.ShowTooltip(this, m_TooltipText, Input.mousePosition, out m_TooltipPopup);
                 m_IsShowingTooltip = true;
             }
         }
 
-        private void ShowDetailedTooltip()
+        public void Hide()
         {
-            if (!m_IsShowingDetailedTooltip)
+            if (m_IsShowingTooltip)
             {
-                m_TooltipPopup.ShowTooltip(m_DetailedTooltipText, Input.mousePosition);
-                m_IsShowingDetailedTooltip = true;
-            }
-        }
-
-        private void HideTooltip()
-        {
-            if (m_IsShowingTooltip || m_IsShowingDetailedTooltip)
-            {
-                m_TooltipPopup.HideTooltip();
-                m_IsShowingTooltip = false;
-                m_IsShowingDetailedTooltip = false;
+                if (m_TooltipPopupManager.HideTooltip(m_TooltipPopup))
+                {
+                    m_IsShowingTooltip = false;
+                }
             }
         }
 
@@ -134,10 +128,10 @@ namespace Unity.BossRoom.Gameplay.UI
         {
             if (gameObject.scene.rootCount > 1) // Hacky way for checking if this is a scene object or a prefab instance and not a prefab definition.
             {
-                if (!m_TooltipPopup)
+                if (!m_TooltipPopupManager)
                 {
                     // typically there's only one tooltip popup in the scene, so pick that
-                    m_TooltipPopup = FindObjectOfType<UITooltipPopup>();
+                    m_TooltipPopupManager = FindObjectOfType<UITooltipPopupManager>();
                 }
             }
         }
