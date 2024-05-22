@@ -422,5 +422,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c0a95b8b7df1454f9c08c5f1ef7621b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uITooltipDetector: {fileID: 5689149382817978311}
-  uiTooltipPopup: {fileID: 1582485235638783507}
+  m_uITooltipDetector: {fileID: 5689149382817978311}
+  m_uiTooltipPopup: {fileID: 1582485235638783507}

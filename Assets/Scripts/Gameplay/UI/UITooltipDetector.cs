@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -112,7 +111,7 @@ namespace Unity.BossRoom.Gameplay.UI
             }
         }
 
-        public void Hide()
+        public void TryHideTooltip()
         {
             if (m_IsShowingTooltip)
             {

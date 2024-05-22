@@ -125,7 +125,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14318e2b887cc8149afdf4400ec24f5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tooltipPrefab: {fileID: 3775814767093979444}
+  m_tooltipPrefab: {fileID: 3775814767093979444}
 --- !u!1 &5331930138599208113
 GameObject:
   m_ObjectHideFlags: 0
@@ -1220,7 +1220,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79e7ca3e19eb99c4f97ff06a95ef7dac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_TooltipPopupManager: {fileID: 0}
+  m_TooltipPopupManager: {fileID: 5326746632957879130}
   m_TooltipText: Unity Gaming Services ProjectID not set up. Click the Readme file
     in the Assets Folder within the Project window in-editor to follow "How to set
     up Unity Gaming Services"

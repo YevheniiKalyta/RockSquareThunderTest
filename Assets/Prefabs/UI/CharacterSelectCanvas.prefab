@@ -720,10 +720,6 @@ MonoBehaviour:
   m_ReadyButtonImage: {fileID: 5940892341148877036}
   m_Checkmark: {fileID: 5940892341683006018}
   m_WelcomeMsg: Welcome, P{0}!
-  m_TooltipFormat: '<b>{0}</b>
-
-
-    {1}'
 --- !u!1 &5940892340859051792
 GameObject:
   m_ObjectHideFlags: 0
@@ -2344,7 +2340,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14318e2b887cc8149afdf4400ec24f5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tooltipPrefab: {fileID: 2222670797444748726}
+  m_tooltipPrefab: {fileID: 2222670797444748726}
 --- !u!1 &5940892342078424648
 GameObject:
   m_ObjectHideFlags: 0
